@@ -8,28 +8,37 @@
     values (#{email}, #{password}, #{name}, #{phoneNumber}, #{nickname})
   </insert>
 
-  <select id="isEmailDuplicated" parameterType="String" resultType="boolean">
-    SELECT EXISTS(
-        SELECT email
-        FROM users
-        WHERE email=#{email}
-    )
+  <select id="existsByEmail" parameterType="String" resultType="boolean">
+    SELECT EXISTS(SELECT email
+                  FROM users
+                  WHERE email = #{email})
+  </select>
+  <select id="existsByNickname" parameterType="String" resultType="boolean">
+    SELECT EXISTS(SELECT nickname
+                  FROM users
+                  WHERE nickname = #{nickname})
   </select>
 
-  <select id="isNicknameDuplicated" parameterType="String" resultType="boolean">
-    SELECT EXISTS(
-      SELECT nickname
-      FROM users
-      WHERE nickname=#{nickname}
-    )
+  <select id="existsByPhoneNumber" parameterType="String" resultType="boolean">
+    SELECT EXISTS(SELECT phoneNumber
+                  FROM users
+                  WHERE phoneNumber = #{phoneNumber})
   </select>
 
-  <select id="isPhoneNumberDuplicated" parameterType="String" resultType="boolean">
-    SELECT EXISTS(
-      SELECT phoneNumber
-      FROM users
-      WHERE phoneNumber=#{phoneNumber}
-    )
+  <select id="findByEmailAndPassword"
+    parameterType="package com.hw.DevHub.domain.users.dto.UserRequest.LoginRequest"
+    resultType="User">
+    SELECT userId,
+           email,
+           password,
+           name,
+           phoneNumber,
+           nickname,
+           profileMessage,
+           profileImagePath
+    FROM users
+    WHERE email = #{email}
+      AND password = #{password}
   </select>
 
 
