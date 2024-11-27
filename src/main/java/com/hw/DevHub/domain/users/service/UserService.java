@@ -4,6 +4,8 @@ import com.hw.DevHub.domain.users.component.encryption.CustomEncryptionComponent
 import com.hw.DevHub.domain.users.domain.User;
 import com.hw.DevHub.domain.users.dto.UserRequest.SignUpRequest;
 import com.hw.DevHub.domain.users.mapper.UserMapper;
+import com.hw.DevHub.global.exception.ErrorCode;
+import com.hw.DevHub.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +18,7 @@ public class UserService {
     private final CustomEncryptionComponent encryptionComponent;
 
     @Transactional
-    public String addUser(SignUpRequest request) {
+    public void addUser(SignUpRequest request) {
 
         String encodedPassword = encryptionComponent.encryptPassword(request.getEmail(),
             request.getPassword());
@@ -29,34 +31,33 @@ public class UserService {
             .nickname(request.getNickname())
             .build();
         userMapper.insertUser(user);
-        return "유저 생성";
     }
 
     @Transactional(readOnly = true)
     public boolean checkEmail(String email) {
-        if (!userMapper.isEmailDuplicated(email)) {
+        if (userMapper.existsByEmail(email)) {
             return true;
         } else {
-            throw new IllegalArgumentException("이미 존재하는 이메일 입니다.");
+            throw new GlobalException(ErrorCode.DUPLICATED_EMAIL);
         }
 
     }
 
     @Transactional(readOnly = true)
     public boolean checkNickname(String nickname) {
-        if (!userMapper.isNicknameDuplicated(nickname)) {
+        if (!userMapper.existsByNickname(nickname)) {
             return true;
         } else {
-            throw new IllegalArgumentException("이미 존재하는 닉네임 입니다.");
+            throw new GlobalException(ErrorCode.DUPLICATED_NICKNAME);
         }
     }
 
     @Transactional(readOnly = true)
     public boolean checkPhoneNumber(String phoneNumber) {
-        if (!userMapper.isPhoneNumberDuplicated(phoneNumber)) {
+        if (!userMapper.existsByPhoneNumber(phoneNumber)) {
             return true;
         } else {
-            throw new IllegalArgumentException("이미 존재하는 연락처 입니다.");
+            throw new GlobalException(ErrorCode.DUPLICATED_PHONE_NUMBER);
         }
     }
 }
