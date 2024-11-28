@@ -32,4 +32,16 @@
            LEFT OUTER JOIN users u on f.user_id = u.user_id
     WHERE feed_id = ${feedId}
   </select>
+
+  <update id="updateFeed">
+    UPDATE feed
+    SET content = #{content}
+    WHERE feed_id = ${feedId}
+  </update>
+
+  <delete id="deleteFeedById">
+    DELETE
+    FROM feed
+    WHERE feed_id = #{feedId}
+  </delete>
 </mapper>
