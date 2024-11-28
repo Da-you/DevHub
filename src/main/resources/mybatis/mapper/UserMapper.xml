@@ -26,20 +26,32 @@
   </select>
 
   <select id="findByEmailAndPassword"
-    parameterType="package com.hw.DevHub.domain.users.dto.UserRequest.LoginRequest"
+    parameterType="com.hw.DevHub.domain.users.dto.UserRequest$LoginRequest"
     resultType="User">
-    SELECT userId,
+    SELECT user_id,
            email,
            password,
            name,
-           phoneNumber,
+           phone_number,
            nickname,
-           profileMessage,
-           profileImagePath
+           profile_message,
+           profile_image_path
     FROM users
     WHERE email = #{email}
       AND password = #{password}
   </select>
 
+  <select id="findByUserId" parameterType="Long" resultType="User">
+    SELECT user_id,
+           email,
+           password,
+           name,
+           phone_number,
+           nickname,
+           profile_message,
+           profile_image_path
+    FROM users
+    WHERE user_id = #{userId}
+  </select>
 
 </mapper>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.hw.DevHub.domain.feed.mapper.FeedMapper">
+  <insert id="insertFeed" parameterType="Feed">
+    insert into feed (user_id, content)
+    values (#{userId}, #{content})
+  </insert>
+
+  <select id="getFeeds" resultType="Feed">
+    SELECT f.feed_id,
+           f.user_id,
+           f.content,
+           f.created_at,
+           u.nickname,
+           u.profile_image_path
+    FROM feed f
+           LEFT OUTER JOIN users u ON f.user_id = u.user_id
+    ORDER BY f.created_at DESC
+  </select>
+
+  <select id="getFeedById" parameterType="Long" resultType="Feed">
+    SELECT f.feed_id,
+           f.user_id,
+           f.content,
+           f.created_at,
+           u.nickname,
+           u.profile_image_path
+    FROM feed f
+           LEFT OUTER JOIN users u on f.user_id = u.user_id
+    WHERE feed_id = ${feedId}
+  </select>
+</mapper>

@@ -12,6 +12,7 @@ public enum ErrorCode {
     DUPLICATED_EMAIL(HttpStatus.CONFLICT, "40301", "중복된 이메일 입니다."),
     DUPLICATED_NICKNAME(HttpStatus.CONFLICT, "40302", "중복된 닉네임 입니다."),
     DUPLICATED_PHONE_NUMBER(HttpStatus.CONFLICT, "40303", "중복된 연락처 입니다."),
+    UNAUTHENTICATED_USER(HttpStatus.UNAUTHORIZED,"40101","로그인 후 이용 가능합니다.")
     ;
 
     private final HttpStatus httpStatus;

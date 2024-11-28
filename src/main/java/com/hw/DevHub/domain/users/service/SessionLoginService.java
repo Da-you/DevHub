@@ -26,7 +26,7 @@ public class SessionLoginService {
 
     @Transactional
     public void login(LoginRequest request) {
-        if (userMapper.existsByEmail(request.getEmail())) {
+        if (!userMapper.existsByEmail(request.getEmail())) {
             throw new GlobalException(ErrorCode.EMAIL_NOT_FOUND);
         }
         String decodePassword = encryptionComponent.encryptPassword(request.getEmail(),
