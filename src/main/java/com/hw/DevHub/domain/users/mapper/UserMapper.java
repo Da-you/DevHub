@@ -18,4 +18,6 @@ public interface UserMapper {
     boolean existsByPhoneNumber(String phoneNumber);
 
     User findByEmailAndPassword(String email, String password);
+
+    User findByUserId(Long userId);
 }
