@@ -1,6 +1,7 @@
 package com.hw.DevHub.global.config;
 
 import com.hw.DevHub.global.annotation.CurrentUserArgumentResolver;
+import com.hw.DevHub.global.interceptor.ApiLogCheckInterceptor;
 import com.hw.DevHub.global.interceptor.LoginRequiredInterceptor;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     private final CurrentUserArgumentResolver currentUserArgumentResolver;
     private final LoginRequiredInterceptor loginRequiredInterceptor;
+    private final ApiLogCheckInterceptor apiLogCheckInterceptor;
 
 
     @Override
@@ -24,6 +26,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(loginRequiredInterceptor);
+        registry.addInterceptor(apiLogCheckInterceptor).order(1);
+        registry.addInterceptor(loginRequiredInterceptor).order(2);
     }
 }
