@@ -1,6 +1,5 @@
 package com.hw.DevHub.domain.feed.api;
 
-import com.hw.DevHub.domain.feed.dto.FeedRequest;
 import com.hw.DevHub.domain.feed.dto.FeedRequest.PostFeedRequest;
 import com.hw.DevHub.domain.feed.dto.FeedResponse.ViewFeed;
 import com.hw.DevHub.domain.feed.service.FeedService;

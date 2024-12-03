@@ -54,4 +54,10 @@
     WHERE user_id = #{userId}
   </select>
 
+  <select id="existsById" parameterType="Long" resultType="boolean">
+    SELECT EXISTS(SELECT user_id
+                  FROM users
+                  WHERE user_id = #{userId})
+  </select>
+
 </mapper>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hw.DevHub.domain.users.mapper.FollowMapper">
+  <insert id="insertFollower" parameterType="Follow">
+    insert into follow (from_user_id, to_target_id)
+    values (#{fromUserId}, #{toTargetId})
+  </insert>
+
+  <delete id="deleteFollower" parameterType="Long">
+    DELETE
+    FROM follow
+    WHERE from_user_id = #{fromUserId}
+    AND to_target_id = #{toTargetId}
+  </delete>
+
+  <select id="existsFollower" resultType="boolean">
+    select exists(select 1
+                  from follow
+                  where from_user_id = #{fromUserId}
+                    and to_target_id = #{toTargetId})
+  </select>
+</mapper>

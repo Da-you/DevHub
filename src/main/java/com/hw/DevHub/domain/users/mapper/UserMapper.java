@@ -20,4 +20,6 @@ public interface UserMapper {
     User findByEmailAndPassword(String email, String password);
 
     User findByUserId(Long userId);
+
+    boolean existsById(Long userId);
 }
