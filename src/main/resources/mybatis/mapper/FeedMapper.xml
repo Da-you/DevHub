@@ -44,4 +44,11 @@
     FROM feed
     WHERE feed_id = #{feedId}
   </delete>
+  
+  <select id="getLatestFeedId" parameterType="Long" resultType="Long">
+    select feed_id
+    from feed
+    where user_id = ${userId}
+    order by created_at desc limit 1
+  </select>
 </mapper>

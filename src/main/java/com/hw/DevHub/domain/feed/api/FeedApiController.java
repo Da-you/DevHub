@@ -16,7 +16,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/feeds")
@@ -28,8 +31,10 @@ public class FeedApiController {
 
     @PostMapping
     @LoginRequired
-    public void postFeed(@CurrentUser Long userId, @RequestBody PostFeedRequest request) {
-        feedService.postFeed(userId, request);
+    public void postFeed(@CurrentUser Long userId,
+        @RequestParam(name = "content") PostFeedRequest request,
+        @RequestPart List<MultipartFile> images) {
+        feedService.postFeed(userId, request, images);
     }
 
     @GetMapping("/{feedId}")
@@ -55,7 +60,7 @@ public class FeedApiController {
     @LoginRequired
     @DeleteMapping("/{feedId}")
     public void deleteFeed(@CurrentUser Long userId, @PathVariable("feedId") Long feedId) {
-        feedService.deleteFeed(userId,feedId);
+        feedService.deleteFeed(userId, feedId);
     }
 
 }
