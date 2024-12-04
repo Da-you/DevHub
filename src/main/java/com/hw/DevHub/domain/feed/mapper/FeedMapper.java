@@ -12,4 +12,6 @@ public interface FeedMapper {
     Feed getFeedById(Long feedId);
     void deleteFeedById(Long feedId);
     void updateFeed(Long feedId, String content);
+
+    Long getLatestFeedId(Long userId);
 }

@@ -6,15 +6,19 @@ import com.hw.DevHub.domain.feed.dto.FeedRequest.PostFeedRequest;
 import com.hw.DevHub.domain.feed.dto.FeedResponse;
 import com.hw.DevHub.domain.feed.dto.FeedResponse.ViewFeed;
 import com.hw.DevHub.domain.feed.mapper.FeedMapper;
+import com.hw.DevHub.domain.image.dto.ImageRequest.ImageInfo;
+import com.hw.DevHub.domain.image.mapper.ImageMapper;
 import com.hw.DevHub.domain.users.domain.User;
 import com.hw.DevHub.domain.users.mapper.UserMapper;
 import com.hw.DevHub.global.exception.ErrorCode;
 import com.hw.DevHub.global.exception.GlobalException;
+import com.hw.DevHub.infra.aws.storage.S3Component;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -22,15 +26,20 @@ public class FeedService {
 
     private final FeedMapper feedMapper;
     private final UserMapper userMapper;
+    ;
+    private final S3Component s3Component;
 
     @Transactional
-    public void postFeed(Long userId, PostFeedRequest request) {
+    public void postFeed(Long userId, PostFeedRequest request, List<MultipartFile> images) {
         User user = userMapper.findByUserId(userId);
         Feed feed = Feed.builder()
             .userId(userId)
             .content(request.getContent())
             .build();
         feedMapper.insertFeed(feed);
+        Long feedId = feedMapper.getLatestFeedId(user.getUserId());
+        s3Component.uploadImages(feedId, images);
+
     }
 
     @Transactional(readOnly = true)
