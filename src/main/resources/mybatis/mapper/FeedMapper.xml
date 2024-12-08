@@ -51,4 +51,17 @@
     where user_id = ${userId}
     order by created_at desc limit 1
   </select>
+  <select id="getMypageFeeds" parameterType="Long" resultType="com.hw.DevHub.domain.feed.dto.FeedResponse$MypageFeeds">
+    select
+        f.feed_id as feedId,
+        i.image_path as thumbnailPath,
+        f.created_at as createdAt
+        from feed f
+    left join image i on f.feed_id = i.feed_id and i.img_index = 1
+    where f.user_id = #{userId}
+    order by f.created_at desc;
+  </select>
+  <select id="getFeedCount" parameterType="Long" resultType="int">
+    select count(*) from feed f where f.user_id = #{userId}
+  </select>
 </mapper>

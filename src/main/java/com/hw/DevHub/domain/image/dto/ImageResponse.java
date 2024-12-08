@@ -11,5 +11,5 @@ public class ImageResponse {
 
     private String imageName;
     private String imagePath;
-    private int img_index;
+    private int imgIndex;
 }

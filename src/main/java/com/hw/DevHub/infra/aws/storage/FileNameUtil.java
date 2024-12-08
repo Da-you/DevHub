@@ -38,6 +38,13 @@ public class FileNameUtil {
         return newFileNames;
     }
 
+
+    public static HashMap<String, String> changeFileName(MultipartFile file) {
+        HashMap<String, String> newFileName = new HashMap<>();
+        newFileName.put(file.getOriginalFilename(), String.valueOf(createNewFileName(file)));
+        return newFileName;
+    }
+
     public static StringBuilder createNewFileName(MultipartFile file) {
         String uuid = UUID.randomUUID().toString();
         String extension = StringUtils.getFilenameExtension(file.getOriginalFilename());

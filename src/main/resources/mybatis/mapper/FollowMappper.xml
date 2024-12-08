@@ -12,7 +12,7 @@
     DELETE
     FROM follow
     WHERE from_user_id = #{fromUserId}
-    AND to_target_id = #{toTargetId}
+      AND to_target_id = #{toTargetId}
   </delete>
 
   <select id="existsFollower" resultType="boolean">
@@ -20,5 +20,12 @@
                   from follow
                   where from_user_id = #{fromUserId}
                     and to_target_id = #{toTargetId})
+  </select>
+
+  <select id="followCount" parameterType="Long"
+    resultType="com.hw.DevHub.domain.users.dto.UserResponse$FollowCountResponse">
+    select
+      (SELECT COUNT(*) FROM follow WHERE to_target_id = #{userId}) AS followerCount,
+      (SELECT COUNT(*) FROM follow WHERE from_user_id = #{userId}) AS followingCount
   </select>
 </mapper>

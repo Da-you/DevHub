@@ -59,5 +59,14 @@
                   FROM users
                   WHERE user_id = #{userId})
   </select>
-
+  <update id="updateProfileMessage">
+    update users
+    set profile_message = #{profileMessage}
+    where user_id = #{userId}
+  </update>
+  <update id="updateProfileImage">
+    update users
+    set profile_image_path = #{profileImagePath}
+    where user_id = #{userId}
+  </update>
 </mapper>

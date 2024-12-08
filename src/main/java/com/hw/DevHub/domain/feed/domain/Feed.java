@@ -1,6 +1,5 @@
 package com.hw.DevHub.domain.feed.domain;
 
-import com.hw.DevHub.domain.users.domain.User;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

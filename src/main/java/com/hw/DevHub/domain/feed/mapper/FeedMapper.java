@@ -1,6 +1,7 @@
 package com.hw.DevHub.domain.feed.mapper;
 
 import com.hw.DevHub.domain.feed.domain.Feed;
+import com.hw.DevHub.domain.feed.dto.FeedResponse.MypageFeeds;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -14,4 +15,7 @@ public interface FeedMapper {
     void updateFeed(Long feedId, String content);
 
     Long getLatestFeedId(Long userId);
+
+    List<MypageFeeds> getMypageFeeds(Long userId);
+    int getFeedCount(Long userId);
 }
