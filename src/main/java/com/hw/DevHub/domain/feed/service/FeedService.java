@@ -7,6 +7,7 @@ import com.hw.DevHub.domain.feed.dto.FeedResponse;
 import com.hw.DevHub.domain.feed.dto.FeedResponse.ViewFeed;
 import com.hw.DevHub.domain.feed.mapper.FeedMapper;
 import com.hw.DevHub.domain.image.dto.ImageRequest.ImageInfo;
+import com.hw.DevHub.domain.image.dto.ImageResponse;
 import com.hw.DevHub.domain.image.mapper.ImageMapper;
 import com.hw.DevHub.domain.users.domain.User;
 import com.hw.DevHub.domain.users.mapper.UserMapper;
@@ -26,7 +27,6 @@ public class FeedService {
 
     private final FeedMapper feedMapper;
     private final UserMapper userMapper;
-    ;
     private final S3Component s3Component;
 
     @Transactional
@@ -48,10 +48,13 @@ public class FeedService {
         List<Feed> feeds = feedMapper.getFeeds();
         for (Feed feed : feeds) {
             User author = userMapper.findByUserId(feed.getUserId());
-            res.add(ViewFeed.builder().feedId(feed.getFeedId())
+            res.add(ViewFeed.builder()
+                .feedId(feed.getFeedId())
                 .profileImagePath(author.getProfileImagePath())
-                .nickname(author.getNickname()).content(
-                    feed.getContent()).createTime(feed.getCreatedAt()).build());
+                .nickname(author.getNickname())
+                .content(feed.getContent())
+                .images(s3Component.getImages(feed.getFeedId()))
+                .createTime(feed.getCreatedAt()).build());
         }
         return res;
     }
@@ -60,12 +63,14 @@ public class FeedService {
     public ViewFeed getFeedById(Long userId, Long feedId) {
         Feed feed = feedMapper.getFeedById(feedId);
         User author = userMapper.findByUserId(userId);
+        List<ImageResponse> images = s3Component.getImages(feedId);
         return ViewFeed.builder()
             .feedId(feedId)
             .profileImagePath(author.getProfileImagePath())
             .nickname(author.getNickname())
             .content(feed.getContent())
             .createTime(feed.getCreatedAt())
+            .images(images)
             .build();
     }
 
@@ -84,6 +89,7 @@ public class FeedService {
         if (!feed.getUserId().equals(userId)) {
             throw new GlobalException(ErrorCode.UNAUTHORIZED);
         }
+        s3Component.deleteFeedImage(feedId);
         feedMapper.deleteFeedById(feedId);
     }
 }

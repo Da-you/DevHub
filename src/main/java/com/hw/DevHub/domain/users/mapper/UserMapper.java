@@ -22,4 +22,8 @@ public interface UserMapper {
     User findByUserId(Long userId);
 
     boolean existsById(Long userId);
+
+    void updateProfileMessage(Long userId, String profileMessage);
+    void updateProfileImage(Long userId, String profileImagePath);
+
 }

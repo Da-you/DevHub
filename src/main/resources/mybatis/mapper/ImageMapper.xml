@@ -16,4 +16,23 @@
       )
     </foreach>
   </insert>
+
+  <select id="getImages" parameterType="Long"
+    resultType="com.hw.DevHub.domain.image.dto.ImageResponse">
+    select image_name, image_path, img_index
+    from Image
+    where feed_id = #{feedId}
+  </select>
+
+  <select id="getImagePathByFeedId" parameterType="Long" resultType="String">
+    select image_path
+    from image
+    where feed_id = #{feedId}
+  </select>
+
+  <delete id="deleteImages" parameterType="Long">
+    delete
+    from image
+    where feed_id = #{feedId}
+  </delete>
 </mapper>

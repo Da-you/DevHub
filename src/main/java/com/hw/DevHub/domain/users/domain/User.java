@@ -66,5 +66,12 @@ public class User {
         }
     }
 
+    public void updateProfileMessage( String profileMessage) {
+        this.profileMessage = profileMessage;
+    }
+    public void updateProfileImagePath(String profileImagePath) {
+        this.profileImagePath = profileImagePath;
+    }
+
 
 }
