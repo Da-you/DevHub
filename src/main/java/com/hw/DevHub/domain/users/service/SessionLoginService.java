@@ -8,6 +8,7 @@ import com.hw.DevHub.domain.users.dto.UserRequest.LoginRequest;
 import com.hw.DevHub.domain.users.mapper.UserMapper;
 import com.hw.DevHub.global.exception.ErrorCode;
 import com.hw.DevHub.global.exception.GlobalException;
+import com.hw.DevHub.infra.fcm.FCMPushService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SessionLoginService {
 
     private final UserMapper userMapper;
+    private final FCMPushService pushService;
     private final CustomEncryptionComponent encryptionComponent;
     /**
      * 서블릿이 제공하는 기술 서블릿을 통해 session 생성시 JSESSIONID 이라는 이름의 쿠키를 생성 추정 불가한 랜덤값을 넣어준다.
@@ -36,6 +38,7 @@ public class SessionLoginService {
             throw new GlobalException(ErrorCode.PASSWORD_MISS_MATCH);
         }
         httpSession.setAttribute(LOGIN_USER, user.getUserId());
+        pushService.setToken(user.getUserId());
     }
 
     @Transactional

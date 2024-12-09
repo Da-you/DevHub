@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hw.DevHub.domain.alarm.mapper.AlarmMapper">
+  <insert id="insertAlarm" parameterType="Alarm">
+    insert into alarm(from_user_id, target_user_id, is_read, alarm_type)
+    values (#{fromUserId}, #{targetUserId}, #{isRead}, #{alarmType})
+  </insert>
+
+  <update id="readAlarm">
+    update alarm
+    set is_read = true
+    where alarm_id = #{alarmId}
+      and target_user_id = #{targetUserId}
+  </update>
+
+  <select id="getAlarms" parameterType="Long">
+    select a.alarm_id, a.from_user_id, a.is_read, a.created_at
+    from alarm a
+    where target_user_id = #{targetUserId}
+    order by a.created_at desc
+  </select>
+
+  <select id="getAlarm" resultType="Alarm">
+    select a.is_read
+    from alarm a
+    where alarm_id = #{alarmId}
+      and target_user_id = #{targetUserId}
+  </select>
+</mapper>
