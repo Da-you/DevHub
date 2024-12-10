@@ -1,10 +1,12 @@
 package com.hw.DevHub.domain.users.service;
 
+import com.hw.DevHub.domain.alarm.service.AlarmService;
 import com.hw.DevHub.domain.users.domain.Follow;
 import com.hw.DevHub.domain.users.mapper.FollowMapper;
 import com.hw.DevHub.domain.users.mapper.UserMapper;
 import com.hw.DevHub.global.exception.ErrorCode;
 import com.hw.DevHub.global.exception.GlobalException;
+import com.hw.DevHub.infra.fcm.FCMPushService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +17,8 @@ public class FollowService {
 
     private final FollowMapper followMapper;
     private final UserMapper userMapper;
+    private final AlarmService alarmService;
+    private final FCMPushService pushService;
 
     @Transactional
     public void followUser(Long userId, Long targetId) {
@@ -30,6 +34,10 @@ public class FollowService {
             .toTargetId(targetId)
             .build();
         followMapper.insertFollower(relationship);
+        alarmService.sendAlarm(userId, targetId);
+
+        pushService.sendFollowPushMessage(targetId);
+
     }
 
 

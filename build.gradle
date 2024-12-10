@@ -35,6 +35,12 @@ dependencies {
     // implementation 'com.amazonaws:aws-java-sdk-s3:1.12.767' // 자바 에플리케이션에서 s3 버키에 접근 할 수 있게 해주는 라이브러리(25년 12월 31일에 만료)
     implementation 'software.amazon.awssdk:s3:2.29.6' // Amazon에서 제공
 
+    // FCM
+    implementation 'com.google.firebase:firebase-admin:9.4.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.10.0'  // Firebase 서버로 푸시 메시지 전송 시 필요
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
