@@ -34,13 +34,10 @@ public class UserService {
         String encodedPassword = encryptionComponent.encryptPassword(request.getEmail(),
             request.getPassword());
 
-        User user = new User.Builder()
-            .email(request.getEmail())
-            .password(encodedPassword)
-            .name(request.getName())
-            .phoneNumber(request.getPhoneNumber())
-            .nickname(request.getNickname())
-            .build();
+        SignUpRequest user = SignUpRequest.builder().email(request.getEmail())
+            .password(encodedPassword).name(
+                request.getName()).phoneNumber(request.getPhoneNumber())
+            .nickname(request.getNickname()).build();
         userMapper.insertUser(user);
     }
 
