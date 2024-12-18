@@ -34,13 +34,10 @@ public class UserService {
         String encodedPassword = encryptionComponent.encryptPassword(request.getEmail(),
             request.getPassword());
 
-        User user = new User.Builder()
-            .email(request.getEmail())
-            .password(encodedPassword)
-            .name(request.getName())
-            .phoneNumber(request.getPhoneNumber())
-            .nickname(request.getNickname())
-            .build();
+        SignUpRequest user = SignUpRequest.builder().email(request.getEmail())
+            .password(encodedPassword).name(
+                request.getName()).phoneNumber(request.getPhoneNumber())
+            .nickname(request.getNickname()).build();
         userMapper.insertUser(user);
     }
 
@@ -63,7 +60,6 @@ public class UserService {
     @Transactional
     public void updateProfileMessage(Long userId, String profileMessage) {
         User user = userMapper.findByUserId(userId);
-        user.updateProfileMessage(profileMessage);
         userMapper.updateProfileMessage(userId, profileMessage);
     }
 
@@ -76,7 +72,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public boolean checkEmail(String email) {
-        if (userMapper.existsByEmail(email)) {
+        if (!userMapper.existsByEmail(email)) {
             return true;
         } else {
             throw new GlobalException(ErrorCode.DUPLICATED_EMAIL);

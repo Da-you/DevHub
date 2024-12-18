@@ -1,6 +1,7 @@
 package com.hw.DevHub.domain.users.mapper;
 
 import com.hw.DevHub.domain.users.domain.User;
+import com.hw.DevHub.domain.users.dto.UserRequest.SignUpRequest;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -9,7 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface UserMapper {
 
-    void insertUser(User user);
+    void insertUser(SignUpRequest request);
 
     boolean existsByEmail(String email);
 
