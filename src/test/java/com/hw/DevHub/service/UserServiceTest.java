@@ -1,6 +1,6 @@
 package com.hw.DevHub.service;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
@@ -12,15 +12,11 @@ import com.hw.DevHub.domain.users.domain.User;
 import com.hw.DevHub.domain.users.dto.UserRequest.SignUpRequest;
 import com.hw.DevHub.domain.users.mapper.UserMapper;
 import com.hw.DevHub.domain.users.service.UserService;
-import com.hw.DevHub.global.exception.ErrorCode;
 import com.hw.DevHub.global.exception.GlobalException;
-import org.apache.catalina.authenticator.SavedRequest;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -42,28 +38,10 @@ public class UserServiceTest {
     @Mock
     CustomEncryptionComponent encryptionComponent;
 
-    User testUser;
-
-    User encryptedUser;
-
     SignUpRequest signUpRequestSetUp;
 
     @BeforeEach
     public void setUp() {
-        testUser = new User.Builder()
-            .email("joe@test.com")
-            .password("abcd1234")
-            .name("JOE")
-            .phoneNumber("01012345678")
-            .nickname("doe")
-            .build();
-
-        encryptedUser = new User.Builder().email("joe@test.com")
-            .password(encryptionComponent.encryptPassword("joe@test.com", "abcd1234"))
-            .name("JOE")
-            .phoneNumber("01012345678")
-            .nickname("doe")
-            .build();
 
         signUpRequestSetUp = SignUpRequest.builder().email("joe@test.com")
             .password("abcd1234")
@@ -71,20 +49,41 @@ public class UserServiceTest {
             .phoneNumber("01012345670")
             .nickname("doe").build();
     }
-
-    // 마이페이지 조회
     // 닉네임 중복
+    @Test
+    @DisplayName("닉네임 중복 시 예외가 발생")
+    void signUpWithDuplicateNickname() {
+        //given
+        String nickname = signUpRequestSetUp.getNickname();
+        //when
+        when(userMapper.existsByNickname(nickname)).thenReturn(true);
+        //then
+        assertThatThrownBy(() -> userService.checkNickname(nickname))
+            .isInstanceOf(GlobalException.class);
+    }
+
     // 연락처 중복
+    @Test
+    @DisplayName("연락처 중복 시 예외가 발생")
+    void signUpWithDuplicatePhoneNumber() {
+        //given
+        String phoneNumber = signUpRequestSetUp.getPhoneNumber();
+        //when
+        when(userMapper.existsByPhoneNumber(phoneNumber)).thenReturn(true);
+        //then
+        assertThatThrownBy(() -> userService.checkPhoneNumber(phoneNumber))
+            .isInstanceOf(GlobalException.class);
+    }
 
     @Test
-    @DisplayName("이메일 중복 시 예외가 발생하며 회원가입에 실패한다.")
+    @DisplayName("이메일 중복 시 예외가 발생")
     void signUpWithDuplicateEmail() {
         //given
         String inputEmail = signUpRequestSetUp.getEmail();
         //when
-        when(userMapper.existsByEmail(inputEmail)).thenReturn(false);
+        when(userMapper.existsByEmail(inputEmail)).thenReturn(true);
         //then
-        Assertions.assertThatThrownBy(() -> userService.checkEmail(inputEmail))
+        assertThatThrownBy(() -> userService.checkEmail(inputEmail))
             .isInstanceOf(GlobalException.class);
 
         //verify
@@ -104,6 +103,6 @@ public class UserServiceTest {
 
         userService.addUser(signUpRequestSetUp);
 
-        verify(userMapper).insertUser(any(SignUpRequest.class));
+        verify(userMapper, times(1)).insertUser(any(SignUpRequest.class));
     }
 }

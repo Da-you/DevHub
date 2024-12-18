@@ -60,7 +60,6 @@ public class UserService {
     @Transactional
     public void updateProfileMessage(Long userId, String profileMessage) {
         User user = userMapper.findByUserId(userId);
-        user.updateProfileMessage(profileMessage);
         userMapper.updateProfileMessage(userId, profileMessage);
     }
 
@@ -73,7 +72,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public boolean checkEmail(String email) {
-        if (userMapper.existsByEmail(email)) {
+        if (!userMapper.existsByEmail(email)) {
             return true;
         } else {
             throw new GlobalException(ErrorCode.DUPLICATED_EMAIL);
