@@ -3,9 +3,9 @@ package com.hw.DevHub.domain.users.service;
 import static com.hw.DevHub.global.constant.SessionConst.LOGIN_USER;
 
 import com.hw.DevHub.domain.users.component.encryption.CustomEncryptionComponent;
+import com.hw.DevHub.domain.users.dao.UserRepository;
 import com.hw.DevHub.domain.users.domain.User;
 import com.hw.DevHub.domain.users.dto.UserRequest.LoginRequest;
-import com.hw.DevHub.domain.users.mapper.UserMapper;
 import com.hw.DevHub.global.exception.ErrorCode;
 import com.hw.DevHub.global.exception.GlobalException;
 import com.hw.DevHub.infra.fcm.FCMPushService;
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class SessionLoginService {
 
-    private final UserMapper userMapper;
+    private final UserRepository userRepository;
     private final FCMPushService pushService;
     private final CustomEncryptionComponent encryptionComponent;
     /**
@@ -26,17 +26,17 @@ public class SessionLoginService {
      */
     private final HttpSession httpSession;
 
-    @Transactional
-    public void login(LoginRequest request) {
-        if (!userMapper.existsByEmail(request.getEmail())) {
-            throw new GlobalException(ErrorCode.EMAIL_NOT_FOUND);
-        }
+    @Transactional(readOnly = true)
+    public User checkLoginInfo(LoginRequest request) {
         String decodePassword = encryptionComponent.encryptPassword(request.getEmail(),
             request.getPassword());
-        User user = userMapper.findByEmailAndPassword(request.getEmail(), decodePassword);
-        if (user == null) {
-            throw new GlobalException(ErrorCode.PASSWORD_MISS_MATCH);
-        }
+        return userRepository.findByEmailAndPassword(request.getEmail(), decodePassword)
+            .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    @Transactional
+    public void login(LoginRequest request) {
+        User user = checkLoginInfo(request);
         httpSession.setAttribute(LOGIN_USER, user.getUserId());
         pushService.setToken(user.getUserId());
     }

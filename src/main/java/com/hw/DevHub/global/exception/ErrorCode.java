@@ -16,6 +16,7 @@ public enum ErrorCode {
     RELATIONSHIP_NOT_FOUND(HttpStatus.NOT_FOUND, "40402", "팔로우한 대상이 아닙니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "40403", "존재하지 않는 사용자 입니다."),
     ALARM_NOT_FOUND(HttpStatus.NOT_FOUND, "40404", "알람이 존재하지 않습니다."),
+    FEED_NOT_FOUND(HttpStatus.NOT_FOUND, "40405", "해당 피드는 존재하지 않습니다."),
 
     DUPLICATED_EMAIL(HttpStatus.CONFLICT, "40301", "중복된 이메일 입니다."),
     DUPLICATED_NICKNAME(HttpStatus.CONFLICT, "40302", "중복된 닉네임 입니다."),

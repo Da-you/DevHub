@@ -1,12 +1,13 @@
 package com.hw.DevHub.infra.aws.storage;
 
 
+import com.hw.DevHub.domain.feed.domain.Feed;
+import com.hw.DevHub.domain.image.dao.ImageRepository;
+import com.hw.DevHub.domain.image.domain.Image;
 import com.hw.DevHub.domain.image.dto.ImageRequest.ImageInfo;
 import com.hw.DevHub.domain.image.dto.ImageRequest.ImageUploadDto;
 import com.hw.DevHub.domain.image.dto.ImageResponse;
 import com.hw.DevHub.domain.image.exception.ImageUploadException;
-import com.hw.DevHub.domain.image.mapper.ImageMapper;
-import com.hw.DevHub.domain.users.mapper.UserMapper;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -33,31 +34,25 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 public class S3Component {
 
     private final S3Client s3Client;
-    private final ImageMapper imageMapper;
-    private final UserMapper userMapper;
+    private final ImageRepository imageRepository;
 
     @Value("${spring.cloud.aws.s3.bucket}")
     private String bucket;
 
     @Transactional
-    public void uploadImages(Long feedId, List<MultipartFile> images) {
-        List<ImageInfo> infos = uploadImagesToS3(images, feedId);
-        List<ImageUploadDto> uploadDtos = new ArrayList<>();
+    public void uploadImages(Feed feed, List<MultipartFile> images) {
+        List<ImageInfo> infos = uploadImagesToS3(images, feed.getFeedId());
         for (int i = 0; i < infos.size(); i++) {
-            uploadDtos.add(ImageUploadDto.builder()
-                .feedId(feedId)
-                .imageName(infos.get(i).getFileName())
+            imageRepository.save(Image.builder().feed(feed).imageName(infos.get(i).getFileName())
                 .imagePath(infos.get(i).getFilePath())
-                .img_index(i + 1)
-                .build());
+                .img_index(i + 1).build());
         }
-        imageMapper.insertImages(uploadDtos);
     }
 
     @Transactional
-    public void uploadProfileImage(Long userId, MultipartFile file) {
+    public String uploadProfileImage(Long userId, MultipartFile file) {
         ImageInfo imageInfo = putS3Profile(file, userId, file.getOriginalFilename());
-        userMapper.updateProfileImage(userId, imageInfo.getFilePath());
+        return imageInfo.getFilePath();
     }
 
     // s3에 업로드
@@ -146,17 +141,22 @@ public class S3Component {
         s3Client.deleteObject(deleteObjectRequest);
     }
 
-    public void deleteFeedImage(Long feedId) {
-        List<String> imagePaths = imageMapper.getImagePathByFeedId(feedId);
-        for (String imagePath : imagePaths) {
-            delete(imagePath);
+    public void deleteFeedImage(Feed feed) {
+        List<Image> images = imageRepository.findALlByFeed(feed);
+        for (Image imagePath : images) {
+            delete(imagePath.getImagePath());
         }
-        imageMapper.deleteImages(feedId);
-
+        imageRepository.deleteAllByFeed(feed);
     }
 
-    public List<ImageResponse> getImages(Long feedId) {
-        return imageMapper.getImages(feedId);
+    public List<ImageResponse> getImages(Feed feed) {
+        List<Image> images = imageRepository.findALlByFeed(feed);
+        List<ImageResponse> res = new ArrayList<>();
+        for (Image image : images) {
+            res.add(ImageResponse.builder().imageName(image.getImageName())
+                .imagePath(image.getImagePath()).imgIndex(image.getImg_index()).build());
+        }
+        return res;
     }
 
 }

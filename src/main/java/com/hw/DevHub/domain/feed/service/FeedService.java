@@ -1,16 +1,12 @@
 package com.hw.DevHub.domain.feed.service;
 
+import com.hw.DevHub.domain.feed.dao.FeedRepository;
 import com.hw.DevHub.domain.feed.domain.Feed;
-import com.hw.DevHub.domain.feed.dto.FeedRequest;
 import com.hw.DevHub.domain.feed.dto.FeedRequest.PostFeedRequest;
-import com.hw.DevHub.domain.feed.dto.FeedResponse;
 import com.hw.DevHub.domain.feed.dto.FeedResponse.ViewFeed;
-import com.hw.DevHub.domain.feed.mapper.FeedMapper;
-import com.hw.DevHub.domain.image.dto.ImageRequest.ImageInfo;
 import com.hw.DevHub.domain.image.dto.ImageResponse;
-import com.hw.DevHub.domain.image.mapper.ImageMapper;
+import com.hw.DevHub.domain.users.dao.UserRepository;
 import com.hw.DevHub.domain.users.domain.User;
-import com.hw.DevHub.domain.users.mapper.UserMapper;
 import com.hw.DevHub.global.exception.ErrorCode;
 import com.hw.DevHub.global.exception.GlobalException;
 import com.hw.DevHub.infra.aws.storage.S3Component;
@@ -25,45 +21,52 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class FeedService {
 
-    private final FeedMapper feedMapper;
-    private final UserMapper userMapper;
+    private final FeedRepository feedRepository;
+    private final UserRepository userRepository;
     private final S3Component s3Component;
 
     @Transactional
     public void postFeed(Long userId, PostFeedRequest request, List<MultipartFile> images) {
-        User user = userMapper.findByUserId(userId);
+        User user = getUser(userId);
         Feed feed = Feed.builder()
-            .userId(userId)
+            .user(user)
             .content(request.getContent())
             .build();
-        feedMapper.insertFeed(feed);
-        Long feedId = feedMapper.getLatestFeedId(user.getUserId());
-        s3Component.uploadImages(feedId, images);
+        feedRepository.save(feed);
+        s3Component.uploadImages(feed, images);
 
+    }
+
+    private User getUser(Long userId) {
+        return userRepository.findById(userId)
+            .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
     public List<ViewFeed> getFeeds(Long userId) {
+        User user = getUser(userId);
         List<ViewFeed> res = new ArrayList<>();
-        List<Feed> feeds = feedMapper.getFeeds();
+        List<Feed> feeds = feedRepository.findAllByUser(user);
         for (Feed feed : feeds) {
-            User author = userMapper.findByUserId(feed.getUserId());
+            User author = getUser(userId);
             res.add(ViewFeed.builder()
                 .feedId(feed.getFeedId())
                 .profileImagePath(author.getProfileImagePath())
                 .nickname(author.getNickname())
                 .content(feed.getContent())
-                .images(s3Component.getImages(feed.getFeedId()))
-                .createTime(feed.getCreatedAt()).build());
+                .images(s3Component.getImages(feed))
+                .createTime(feed.getCreatedAt())
+                .build());
         }
         return res;
     }
 
     @Transactional(readOnly = true)
     public ViewFeed getFeedById(Long userId, Long feedId) {
-        Feed feed = feedMapper.getFeedById(feedId);
-        User author = userMapper.findByUserId(userId);
-        List<ImageResponse> images = s3Component.getImages(feedId);
+        Feed feed = feedRepository.findByFeedId(feedId)
+            .orElseThrow(() -> new GlobalException(ErrorCode.FEED_NOT_FOUND));
+        User author = getUser(userId);
+        List<ImageResponse> images = s3Component.getImages(feed);
         return ViewFeed.builder()
             .feedId(feedId)
             .profileImagePath(author.getProfileImagePath())
@@ -76,20 +79,21 @@ public class FeedService {
 
     @Transactional
     public void updateFeed(Long userId, Long feedId, PostFeedRequest request) {
-        Feed feed = feedMapper.getFeedById(feedId);
-        if (!feed.getUserId().equals(userId)) {
+        Feed feed = feedRepository.findByFeedId(feedId)
+            .orElseThrow(() -> new GlobalException(ErrorCode.FEED_NOT_FOUND));
+        if (!feed.getUser().getUserId().equals(userId)) {
             throw new GlobalException(ErrorCode.UNAUTHORIZED);
         }
-        feedMapper.updateFeed(feedId, request.getContent());
+        feed.updateFeed(request.getContent());
     }
 
     @Transactional
     public void deleteFeed(Long userId, Long feedId) {
-        Feed feed = feedMapper.getFeedById(feedId);
-        if (!feed.getUserId().equals(userId)) {
+        Feed feed = feedRepository.findByFeedId(feedId)
+            .orElseThrow(() -> new GlobalException(ErrorCode.FEED_NOT_FOUND));
+        if (!feed.getUser().getUserId().equals(userId)) {
             throw new GlobalException(ErrorCode.UNAUTHORIZED);
         }
-        s3Component.deleteFeedImage(feedId);
-        feedMapper.deleteFeedById(feedId);
+        s3Component.deleteFeedImage(feed);
     }
 }
