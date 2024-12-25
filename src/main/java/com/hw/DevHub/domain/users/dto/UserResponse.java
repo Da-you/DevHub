@@ -25,7 +25,9 @@ public class UserResponse {
         private List<MypageFeeds> feeds;
     }
 
+
     @Getter
+    @Builder
     @AllArgsConstructor
     public static class FollowCountResponse {
 

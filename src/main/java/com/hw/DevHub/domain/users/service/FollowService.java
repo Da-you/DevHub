@@ -1,9 +1,10 @@
 package com.hw.DevHub.domain.users.service;
 
 import com.hw.DevHub.domain.alarm.service.AlarmService;
+import com.hw.DevHub.domain.users.dao.FollowRepository;
+import com.hw.DevHub.domain.users.dao.UserRepository;
 import com.hw.DevHub.domain.users.domain.Follow;
-import com.hw.DevHub.domain.users.mapper.FollowMapper;
-import com.hw.DevHub.domain.users.mapper.UserMapper;
+import com.hw.DevHub.domain.users.domain.User;
 import com.hw.DevHub.global.exception.ErrorCode;
 import com.hw.DevHub.global.exception.GlobalException;
 import com.hw.DevHub.infra.fcm.FCMPushService;
@@ -15,13 +16,15 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class FollowService {
 
-    private final FollowMapper followMapper;
-    private final UserMapper userMapper;
+    private final FollowRepository followRepository;
+    private final UserRepository userRepository;
     private final AlarmService alarmService;
     private final FCMPushService pushService;
 
     @Transactional
     public void followUser(Long userId, Long targetId) {
+        User user = getUser(userId);
+        User target = getUser(targetId);
         validatedSelfFollow(userId, targetId);
 
         if (isNotExistsTargetId(targetId)) {
@@ -30,10 +33,10 @@ public class FollowService {
             throw new GlobalException(ErrorCode.ALREADY_RELATIONSHIP);
         }
         Follow relationship = Follow.builder()
-            .fromUserId(userId)
-            .toTargetId(targetId)
+            .fromUser(user)
+            .toTarget(target)
             .build();
-        followMapper.insertFollower(relationship);
+        followRepository.save(relationship);
         alarmService.sendAlarm(userId, targetId);
 
         pushService.sendFollowPushMessage(targetId);
@@ -44,22 +47,30 @@ public class FollowService {
     @Transactional
     public void unfollowUser(Long userId, Long targetId) {
         validatedSelfFollow(userId, targetId);
-
+        User from = getUser(userId);
+        User target = getUser(targetId);
         if (isNotExistsTargetId(targetId)) {
             throw new GlobalException(ErrorCode.USER_NOT_FOUND);
-        } else if (!checkExistsFollow(userId, targetId)) {
+        } else if (checkExistsFollow(userId, targetId)) {
             throw new GlobalException(ErrorCode.ALREADY_RELATIONSHIP);
         }
-        followMapper.deleteFollower(userId, targetId);
+        followRepository.deleteByFromUserAndToTarget(from, target);
     }
 
     private boolean isNotExistsTargetId(Long targetId) {
-        return !userMapper.existsById(targetId);
+        return !userRepository.existsById(targetId);
     }
 
 
     private boolean checkExistsFollow(Long userId, Long targetId) {
-        return followMapper.existsFollower(userId, targetId);
+        User from = getUser(userId);
+        User target = getUser(targetId);
+        return followRepository.existsByFromUserAndToTarget(from, target);
+    }
+
+    private User getUser(Long targetId) {
+        return userRepository.findById(targetId)
+            .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
     }
 
     private void validatedSelfFollow(Long userId, Long targetId) {

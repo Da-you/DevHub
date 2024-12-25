@@ -66,7 +66,7 @@ public class UserApiController {
     @GetMapping("/mypage/{targetId}")
     public ApiResponse<MypageResponse> getMypage(@CurrentUser Long userId,
         @PathVariable Long targetId) {
-        return ApiResponse.success(userService.getMypage(userId, targetId));
+        return ApiResponse.success(userService.getMypage(targetId));
     }
 
     @LoginRequired
