@@ -17,6 +17,7 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "40403", "존재하지 않는 사용자 입니다."),
     ALARM_NOT_FOUND(HttpStatus.NOT_FOUND, "40404", "알람이 존재하지 않습니다."),
     FEED_NOT_FOUND(HttpStatus.NOT_FOUND, "40405", "해당 피드는 존재하지 않습니다."),
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND,"40406" ,"해당 댓글은 존재하지 않습니다." ),
 
     DUPLICATED_EMAIL(HttpStatus.CONFLICT, "40301", "중복된 이메일 입니다."),
     DUPLICATED_NICKNAME(HttpStatus.CONFLICT, "40302", "중복된 닉네임 입니다."),
@@ -24,7 +25,7 @@ public enum ErrorCode {
 
     UNAUTHENTICATED_USER(HttpStatus.UNAUTHORIZED, "40101", "로그인 후 이용 가능합니다."),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "40102", "해당 요청에 대한 권한이 없습니다."),
-    ;
+   ;
 
     private final HttpStatus httpStatus;
     private final String errorCode;

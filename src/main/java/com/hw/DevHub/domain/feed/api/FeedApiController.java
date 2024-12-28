@@ -1,5 +1,7 @@
 package com.hw.DevHub.domain.feed.api;
 
+import com.hw.DevHub.domain.comment.dto.CommentRequest;
+import com.hw.DevHub.domain.comment.service.CommentService;
 import com.hw.DevHub.domain.feed.dto.FeedRequest.PostFeedRequest;
 import com.hw.DevHub.domain.feed.dto.FeedResponse.ViewFeed;
 import com.hw.DevHub.domain.feed.service.FeedService;
@@ -27,6 +29,7 @@ public class FeedApiController {
 
 
     private final FeedService feedService;
+    private final CommentService commentService;
 
     @PostMapping
     @LoginRequired
@@ -62,4 +65,22 @@ public class FeedApiController {
         feedService.deleteFeed(userId, feedId);
     }
 
+    @PostMapping("/{feedId}/comment")
+    public void postComment(@CurrentUser Long userId, @PathVariable("feedId") Long feedId,
+        @RequestBody CommentRequest request) {
+        commentService.comment(userId, feedId, request);
+    }
+
+    @PatchMapping("/{feedId}/comment/{commentId}")
+    public void updateComment(@CurrentUser Long userId, @PathVariable("feedId") Long feedId,
+        @PathVariable Long commentId,
+        @RequestBody CommentRequest request) {
+        commentService.updateComment(userId, feedId, commentId, request);
+    }
+
+    @DeleteMapping("/{feedId}/comment/{commentId}")
+    public void deleteComment(@CurrentUser Long userId, @PathVariable("feedId") Long feedId,
+        @PathVariable Long commentId) {
+        commentService.deleteComment(userId, feedId, commentId);
+    }
 }
