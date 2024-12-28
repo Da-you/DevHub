@@ -33,7 +33,7 @@ public class CommentService {
             Comment.builder()
                 .user(user)
                 .feed(feed)
-                .content(request.getComment())
+                .content(request.getContent())
                 .build()
         );
     }
@@ -44,10 +44,10 @@ public class CommentService {
             .orElseThrow(() -> new GlobalException(ErrorCode.FEED_NOT_FOUND));
         Comment comment = commentRepository.findByFeedAndId(feed, commentId)
             .orElseThrow(() -> new GlobalException(ErrorCode.COMMENT_NOT_FOUND));
-        if (comment.getUser().getUserId().equals(userId)) {
+        if (!comment.getUser().getUserId().equals(userId)) {
             throw new GlobalException(ErrorCode.UNAUTHORIZED);
         }
-        comment.updateContent(request.getComment());
+        comment.updateContent(request.getContent());
     }
 
     @Transactional

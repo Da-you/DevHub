@@ -29,14 +29,14 @@ public class LikeService {
             .orElseThrow(() -> new GlobalException(ErrorCode.FEED_NOT_FOUND));
         if (isLike(user, feed)) {
             feedLikeCancel(user, feed);
+        } else {
+            feedLikeRepository.save(
+                FeedLike.builder()
+                    .user(user)
+                    .feed(feed)
+                    .build()
+            );
         }
-
-        feedLikeRepository.save(
-            FeedLike.builder()
-                .user(user)
-                .feed(feed)
-                .build()
-        );
     }
 
     private boolean isLike(User user, Feed feed) {

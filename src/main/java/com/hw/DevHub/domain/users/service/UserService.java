@@ -1,7 +1,8 @@
 package com.hw.DevHub.domain.users.service;
 
+import com.hw.DevHub.domain.feed.dao.FeedRepository;
+import com.hw.DevHub.domain.feed.domain.Feed;
 import com.hw.DevHub.domain.feed.dto.FeedResponse.MypageFeeds;
-import com.hw.DevHub.domain.feed.mapper.FeedMapper;
 import com.hw.DevHub.domain.users.component.encryption.CustomEncryptionComponent;
 import com.hw.DevHub.domain.users.dao.FollowRepository;
 import com.hw.DevHub.domain.users.dao.UserRepository;
@@ -12,6 +13,7 @@ import com.hw.DevHub.domain.users.dto.UserResponse.MypageResponse;
 import com.hw.DevHub.global.exception.ErrorCode;
 import com.hw.DevHub.global.exception.GlobalException;
 import com.hw.DevHub.infra.aws.storage.S3Component;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,7 +26,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
-    private final FeedMapper feedMapper;
+    private final FeedRepository feedRepository;
     private final S3Component s3Component;
     private final CustomEncryptionComponent encryptionComponent;
 
@@ -46,14 +48,26 @@ public class UserService {
         User user = getUser(targetId);
         int follower = followRepository.countByToTarget(user);
         int following = followRepository.countByFromUser(user);
-        List<MypageFeeds> feeds = feedMapper.getMypageFeeds(targetId);
+
+        List<MypageFeeds> feeds = new ArrayList<>();
+        List<Feed> feedList = feedRepository.findAllByUser(user);
+        for (Feed feed : feedList) {
+            feeds.add(MypageFeeds.builder()
+                .feedId(feed.getFeedId())
+                .thumbnailPath(feed.getImages().getFirst().getImagePath())
+                .likeCount(feed.getFeedLikes().size())
+                .commentCount(feed.getComments().size())
+                .createdAt(feed.getCreatedAt())
+                .build()
+            );
+        }
         return MypageResponse.builder()
             .nickname(user.getNickname())
             .profileImagePath(user.getProfileImagePath())
             .profileMessage(user.getProfileMessage())
             .countResponse(FollowCountResponse.builder().followerCount(follower)
                 .followingCount(following).build())
-            .feedCount(feedMapper.getFeedCount(targetId))
+            .feedCount(feedList.size())
             .feeds(feeds)
             .build();
     }

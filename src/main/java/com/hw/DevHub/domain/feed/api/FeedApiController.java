@@ -34,8 +34,8 @@ public class FeedApiController {
     @PostMapping
     @LoginRequired
     public void postFeed(@CurrentUser Long userId,
-        @RequestParam(name = "content") PostFeedRequest request,
-        @RequestPart List<MultipartFile> images) {
+        @RequestPart(value = "content") PostFeedRequest request,
+        @RequestPart(name = "files") List<MultipartFile> images) {
         feedService.postFeed(userId, request, images);
     }
 
@@ -65,19 +65,20 @@ public class FeedApiController {
         feedService.deleteFeed(userId, feedId);
     }
 
+    @LoginRequired
     @PostMapping("/{feedId}/comment")
     public void postComment(@CurrentUser Long userId, @PathVariable("feedId") Long feedId,
         @RequestBody CommentRequest request) {
         commentService.comment(userId, feedId, request);
     }
-
+    @LoginRequired
     @PatchMapping("/{feedId}/comment/{commentId}")
     public void updateComment(@CurrentUser Long userId, @PathVariable("feedId") Long feedId,
         @PathVariable Long commentId,
         @RequestBody CommentRequest request) {
         commentService.updateComment(userId, feedId, commentId, request);
     }
-
+    @LoginRequired
     @DeleteMapping("/{feedId}/comment/{commentId}")
     public void deleteComment(@CurrentUser Long userId, @PathVariable("feedId") Long feedId,
         @PathVariable Long commentId) {

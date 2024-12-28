@@ -17,9 +17,9 @@ public class LikeApiController {
     private final LikeService likeService;
 
     @LoginRequired
-    @PostMapping("/{postId}")
-    public void feedLike(@CurrentUser Long userId, @PathVariable Long postId) {
-        likeService.feedLike(userId, postId);
+    @PostMapping("/{feedId}")
+    public void feedLike(@CurrentUser Long userId, @PathVariable Long feedId) {
+        likeService.feedLike(userId, feedId);
     }
 
 }

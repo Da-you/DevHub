@@ -1,5 +1,7 @@
 package com.hw.DevHub.domain.feed.service;
 
+import com.hw.DevHub.domain.comment.domain.Comment;
+import com.hw.DevHub.domain.comment.dto.CommentResponse;
 import com.hw.DevHub.domain.feed.dao.FeedRepository;
 import com.hw.DevHub.domain.feed.domain.Feed;
 import com.hw.DevHub.domain.feed.dto.FeedRequest.PostFeedRequest;
@@ -55,7 +57,9 @@ public class FeedService {
                 .nickname(author.getNickname())
                 .content(feed.getContent())
                 .images(s3Component.getImages(feed))
-                .createTime(feed.getCreatedAt())
+                .likeCount(feed.getFeedLikes().size())
+                .commentCount(feed.getComments().size())
+                .createdAt(feed.getCreatedAt())
                 .build());
         }
         return res;
@@ -67,12 +71,28 @@ public class FeedService {
             .orElseThrow(() -> new GlobalException(ErrorCode.FEED_NOT_FOUND));
         User author = getUser(userId);
         List<ImageResponse> images = s3Component.getImages(feed);
+        List<Comment> commentList = feed.getComments();
+        List<CommentResponse> comments = new ArrayList<>();
+        for (Comment comment : commentList) {
+            comments.add(
+                CommentResponse.builder()
+                    .commentId(comment.getId())
+                    .profileImagePath(comment.getUser().getProfileImagePath())
+                    .nickname(comment.getUser().getNickname())
+                    .content(comment.getContent())
+                    .createdAt(comment.getCreatedAt())
+                    .build()
+            );
+        }
         return ViewFeed.builder()
             .feedId(feedId)
             .profileImagePath(author.getProfileImagePath())
             .nickname(author.getNickname())
             .content(feed.getContent())
-            .createTime(feed.getCreatedAt())
+            .likeCount(feed.getFeedLikes().size())
+            .commentCount(feed.getComments().size())
+            .comments(comments)
+            .createdAt(feed.getCreatedAt())
             .images(images)
             .build();
     }
