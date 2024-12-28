@@ -11,8 +11,9 @@ public class FeedRequest {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class PostFeedRequest {
+
         @NotNull(message = "피드의 내용을 입력해주세요.")
-        String content;
+        private String content;
     }
 
 }
