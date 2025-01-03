@@ -29,14 +29,15 @@ public class LikeService {
             .orElseThrow(() -> new GlobalException(ErrorCode.FEED_NOT_FOUND));
         if (isLike(user, feed)) {
             feedLikeCancel(user, feed);
+        } else {
+            feedLikeRepository.save(
+                FeedLike.builder()
+                    .user(user)
+                    .feed(feed)
+                    .build()
+            );
+            feed.addLike();
         }
-
-        feedLikeRepository.save(
-            FeedLike.builder()
-                .user(user)
-                .feed(feed)
-                .build()
-        );
     }
 
     private boolean isLike(User user, Feed feed) {
@@ -47,6 +48,7 @@ public class LikeService {
     public void feedLikeCancel(User user, Feed feed) {
         FeedLike like = feedLikeRepository.findFeedLikeByUserAndFeed(user, feed);
         feedLikeRepository.delete(like);
+        feed.removeLike();
     }
 
 }

@@ -11,6 +11,6 @@ import org.jetbrains.annotations.NotNull;
 public class CommentRequest {
 
     @NotNull
-    private String comment;
+    private String content;
 
 }
