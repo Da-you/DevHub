@@ -55,8 +55,8 @@ public class UserService {
             feeds.add(MypageFeeds.builder()
                 .feedId(feed.getFeedId())
                 .thumbnailPath(feed.getImages().getFirst().getImagePath())
-                .likeCount(feed.getFeedLikes().size())
-                .commentCount(feed.getComments().size())
+                .likeCount(feed.getLikeCount())
+                .commentCount(feed.getCommentCount())
                 .createdAt(feed.getCreatedAt())
                 .build()
             );

@@ -36,6 +36,7 @@ public class LikeService {
                     .feed(feed)
                     .build()
             );
+            feed.addLike();
         }
     }
 
@@ -47,6 +48,7 @@ public class LikeService {
     public void feedLikeCancel(User user, Feed feed) {
         FeedLike like = feedLikeRepository.findFeedLikeByUserAndFeed(user, feed);
         feedLikeRepository.delete(like);
+        feed.removeLike();
     }
 
 }

@@ -42,24 +42,40 @@ public class Feed extends BaseTimeEntity {
 
     @Column(nullable = false)
     private String content;
+    @Column(nullable = false)
+    private int likeCount;
+    @Column(nullable = false)
+    private int commentCount;
 
     @OneToMany(mappedBy = "feed", orphanRemoval = true)
     private List<Image> images = new ArrayList<>();
-
-    @OneToMany(mappedBy = "feed", orphanRemoval = true)
-    private Set<FeedLike> feedLikes = new HashSet<>();
-
-    @OneToMany(mappedBy = "feed", orphanRemoval = true)
-    private List<Comment> comments = new ArrayList<>();
 
 
     @Builder
     public Feed(User user, String content) {
         this.user = user;
         this.content = content;
+        this.likeCount = 0;
+        this.commentCount = 0;
     }
 
     public void updateFeed(String content) {
         this.content = content;
+    }
+
+    public void addLike() {
+        this.likeCount += 1;
+    }
+
+    public void removeLike() {
+        this.likeCount -= 1;
+    }
+
+    public void addComment() {
+        this.commentCount += 1;
+    }
+
+    public void removeComment() {
+        this.commentCount -= 1;
     }
 }

@@ -35,4 +35,13 @@ public class UserResponse {
         private int followingCount;
     }
 
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class UserInfo {
+
+        private String nickname;
+        private String profileImagePath;
+    }
+
 }

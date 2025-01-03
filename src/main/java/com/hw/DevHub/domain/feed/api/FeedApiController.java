@@ -5,10 +5,12 @@ import com.hw.DevHub.domain.comment.service.CommentService;
 import com.hw.DevHub.domain.feed.dto.FeedRequest.PostFeedRequest;
 import com.hw.DevHub.domain.feed.dto.FeedResponse.ViewFeed;
 import com.hw.DevHub.domain.feed.service.FeedService;
+import com.hw.DevHub.domain.users.dto.UserResponse.UserInfo;
 import com.hw.DevHub.global.annotation.CurrentUser;
 import com.hw.DevHub.global.annotation.LoginRequired;
 import com.hw.DevHub.global.response.ApiResponse;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -71,6 +73,7 @@ public class FeedApiController {
         @RequestBody CommentRequest request) {
         commentService.comment(userId, feedId, request);
     }
+
     @LoginRequired
     @PatchMapping("/{feedId}/comment/{commentId}")
     public void updateComment(@CurrentUser Long userId, @PathVariable("feedId") Long feedId,
@@ -78,10 +81,18 @@ public class FeedApiController {
         @RequestBody CommentRequest request) {
         commentService.updateComment(userId, feedId, commentId, request);
     }
+
     @LoginRequired
     @DeleteMapping("/{feedId}/comment/{commentId}")
     public void deleteComment(@CurrentUser Long userId, @PathVariable("feedId") Long feedId,
         @PathVariable Long commentId) {
         commentService.deleteComment(userId, feedId, commentId);
+    }
+
+    @LoginRequired
+    @GetMapping("/{feedId}/likes")
+    public ApiResponse<Set<UserInfo>> getLikes(@CurrentUser Long userId,
+        @PathVariable("feedId") Long feedId) {
+        return ApiResponse.success(feedService.getFeedLikeUsers(feedId));
     }
 }

@@ -36,6 +36,7 @@ public class CommentService {
                 .content(request.getContent())
                 .build()
         );
+        feed.addComment();
     }
 
     @Transactional
@@ -63,6 +64,7 @@ public class CommentService {
             throw new GlobalException(ErrorCode.UNAUTHORIZED);
         }
         commentRepository.delete(comment);
+        feed.removeLike();
 
     }
 
