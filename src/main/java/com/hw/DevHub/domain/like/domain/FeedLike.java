@@ -34,11 +34,25 @@ public class FeedLike extends BaseTimeEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
+    private boolean isLiked;
+
 
     @Builder
     public FeedLike(Feed feed, User user) {
         this.feed = feed;
         this.user = user;
+        this.isLiked = true;
+    }
+
+    public void updateStatus() {
+        if (isLiked) {
+            this.isLiked = false;
+            feed.removeLike();
+        } else {
+            this.isLiked = true;
+            feed.addLike();
+        }
+
     }
 
 }

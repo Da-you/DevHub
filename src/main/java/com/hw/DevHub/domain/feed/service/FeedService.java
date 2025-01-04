@@ -75,7 +75,7 @@ public class FeedService {
 
     @Transactional(readOnly = true)
     public ViewFeed getFeedById(Long userId, Long feedId) {
-        Feed feed = feedRepository.findByFeedId(feedId)
+        Feed feed = feedRepository.findById(feedId)
             .orElseThrow(() -> new GlobalException(ErrorCode.FEED_NOT_FOUND));
         User author = getUser(userId);
         List<ImageResponse> images = s3Component.getImages(feed);
@@ -127,7 +127,7 @@ public class FeedService {
 
     @Transactional(readOnly = true)
     public Set<UserInfo> getFeedLikeUsers(Long feedId) {
-        Feed feed = feedRepository.findByFeedId(feedId)
+        Feed feed = feedRepository.findById(feedId)
             .orElseThrow(() -> new GlobalException(ErrorCode.FEED_NOT_FOUND));
         Set<UserInfo> res = new HashSet<>();
         List<FeedLike> likes = likeRepository.findAllByFeed(feed);

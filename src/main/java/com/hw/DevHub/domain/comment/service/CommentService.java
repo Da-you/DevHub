@@ -26,7 +26,7 @@ public class CommentService {
     public void comment(Long userId, Long feedId, CommentRequest request) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
-        Feed feed = feedRepository.findById(feedId)
+        Feed feed = feedRepository.findByFeedId(feedId)
             .orElseThrow(() -> new GlobalException(ErrorCode.FEED_NOT_FOUND));
 
         commentRepository.save(
@@ -53,7 +53,7 @@ public class CommentService {
 
     @Transactional
     public void deleteComment(Long userId, Long feedId, Long commentId) {
-        Feed feed = feedRepository.findById(feedId)
+        Feed feed = feedRepository.findByFeedId(feedId)
             .orElseThrow(() -> new GlobalException(ErrorCode.FEED_NOT_FOUND));
         Comment comment = commentRepository.findByFeedAndId(feed, commentId)
             .orElseThrow(() -> new GlobalException(ErrorCode.COMMENT_NOT_FOUND));
@@ -64,7 +64,7 @@ public class CommentService {
             throw new GlobalException(ErrorCode.UNAUTHORIZED);
         }
         commentRepository.delete(comment);
-        feed.removeLike();
+        feed.removeComment();
 
     }
 
