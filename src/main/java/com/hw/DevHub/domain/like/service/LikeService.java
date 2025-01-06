@@ -10,8 +10,10 @@ import com.hw.DevHub.global.exception.ErrorCode;
 import com.hw.DevHub.global.exception.GlobalException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LikeService {
@@ -25,11 +27,11 @@ public class LikeService {
     public void feedLike(Long userId, Long feedId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
-        Feed feed = feedRepository.findById(feedId)
+        Feed feed = feedRepository.findByFeedId(feedId)
             .orElseThrow(() -> new GlobalException(ErrorCode.FEED_NOT_FOUND));
-        if (isLike(user, feed)) {
-            feedLikeCancel(user, feed);
-        } else {
+        FeedLike like = feedLikeRepository.findFeedLikeByUserAndFeed(user, feed);
+        if (like == null) {
+            log.info("null 체킹 호출 user {}, feed {}", userId, feedId);
             feedLikeRepository.save(
                 FeedLike.builder()
                     .user(user)
@@ -37,18 +39,29 @@ public class LikeService {
                     .build()
             );
             feed.addLike();
+        } else {
+            log.info("상태 변화");
+            like.updateStatus();
         }
     }
 
-    private boolean isLike(User user, Feed feed) {
-        return feedLikeRepository.existsFeedLikeByUserAndFeed(user, feed);
+    @Transactional
+    public boolean isLike(User user, Feed feed) {
+        boolean exist = feedLikeRepository.existsFeedLikeByUserAndFeed(user, feed);
+        log.info("Check if user {} likes feed {}: {}", user.getUserId(), feed.getFeedId(), exist);
+        return exist;
     }
 
     @Transactional
     public void feedLikeCancel(User user, Feed feed) {
         FeedLike like = feedLikeRepository.findFeedLikeByUserAndFeed(user, feed);
-        feedLikeRepository.delete(like);
+        log.info("like canceled 호출: {}", like);
         feed.removeLike();
+    }
+
+    @Transactional
+    public void likeStatus(FeedLike like) {
+        like.updateStatus();
     }
 
 }
