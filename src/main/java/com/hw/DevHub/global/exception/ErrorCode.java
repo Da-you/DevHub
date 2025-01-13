@@ -25,6 +25,9 @@ public enum ErrorCode {
 
     UNAUTHENTICATED_USER(HttpStatus.UNAUTHORIZED, "40101", "로그인 후 이용 가능합니다."),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "40102", "해당 요청에 대한 권한이 없습니다."),
+
+    CSV_READ_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"50001","CSV 파일을 읽을 수 없습니다."),
+    CSV_REFACTOR_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"50002","CSV 파일을 수정할 수 없습니다."),
    ;
 
     private final HttpStatus httpStatus;
