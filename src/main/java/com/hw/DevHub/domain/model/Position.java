@@ -14,7 +14,8 @@ public enum Position {
     AI("AI"),
     FULL_STACK("풀스택"),
     DATA("데이터 엔지니어"),
-    ML("머신러닝");
+    ML("머신러닝"),
+    APP("앱 개발자");
 
     public final String name;
 

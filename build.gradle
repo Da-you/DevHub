@@ -23,6 +23,11 @@ repositories {
     mavenCentral()
 }
 
+// 프로젝트에서 사용하는 전역 변수 설정
+ext {
+    set('queryDslVersion', "5.0.0")
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -30,6 +35,12 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
     // jpa
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // query dsl
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"
+    annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
     annotationProcessor 'org.projectlombok:lombok'
@@ -51,10 +62,34 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+// 1. Q-Class 생성 디렉토리 설정
+def queryDslSrcDir = 'src/main/generated/querydsl/'
+
+// 2. 자바 컴파일 작업 시 생성 소스코드 출력을 queryDslSrcDir로 지정
+tasks.withType(JavaCompile).configureEach {
+    options.getGeneratedSourceOutputDirectory().set(file(queryDslSrcDir))
+}
+
+// 3. 소스 코드로 인식할 디렉토리 경로에 Q-Class 파일 추가
+sourceSets {
+    main.java.srcDirs += [queryDslSrcDir]
+}
+// 4. clean 작업 수행시 지정 디렉토리 삭제 : 자동 생성된 Q-Class를 삭제
+clean {
+    delete file(queryDslSrcDir)
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    querydsl.extendsFrom compileClasspath
+}
+
 tasks.named('test') {
     useJUnitPlatform()
 }
 // 테스트 코드를 제외한 빌드 수행
-//tasks.withType(Test) {
-//    enabled = false
-//}
+tasks.withType(Test) {
+    enabled = false
+}

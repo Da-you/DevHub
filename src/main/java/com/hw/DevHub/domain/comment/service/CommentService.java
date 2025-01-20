@@ -10,7 +10,6 @@ import com.hw.DevHub.domain.users.domain.User;
 import com.hw.DevHub.global.exception.ErrorCode;
 import com.hw.DevHub.global.exception.GlobalException;
 import jakarta.transaction.Transactional;
-import java.security.PublicKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

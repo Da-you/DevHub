@@ -3,16 +3,11 @@ package com.hw.DevHub.infra.fcm;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingException;
-import com.google.firebase.messaging.Message;
 import com.hw.DevHub.domain.alarm.model.AlarmType;
 import com.hw.DevHub.infra.fcm.dto.FCMMessageRequest;
 import java.io.IOException;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.MediaType;
@@ -20,11 +15,11 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
@@ -35,9 +30,8 @@ public class FCMPushService {
 
     private final ObjectMapper objectMapper;
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    private final MessageSource messageSource;
     @Value("${fcm.key.path}")
     private String SERVICE_ACCOUNT;
     @Value("${fcm.key.url}")
@@ -56,7 +50,7 @@ public class FCMPushService {
             setToken(userId);
         }
 
-        return redisTemplate.opsForValue().get(key);
+        return (String) redisTemplate.opsForValue().get(key);
     }
 
     public void deleteToken(Long userId) {
@@ -90,7 +84,6 @@ public class FCMPushService {
                 .build();
 
             Response response = client.newCall(request).execute();
-            log.info(response.body().string());
         } catch (IOException e) {
             log.error(e.getMessage(), targetUserId);
         }

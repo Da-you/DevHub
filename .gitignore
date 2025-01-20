@@ -155,6 +155,9 @@ $RECYCLE.BIN/
 *.yml
 *.json
 
+# q class
+/src/main/generated/quesrydls
+
 # Ignore Gradle GUI config
 gradle-app.setting
 

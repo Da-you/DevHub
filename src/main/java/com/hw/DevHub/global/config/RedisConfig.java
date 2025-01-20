@@ -13,6 +13,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 @EnableRedisRepositories
 public class RedisConfig {
+
     @Value("${spring.data.redis.host}")
     private String host;
     @Value("${spring.data.redis.port}")
@@ -20,14 +21,14 @@ public class RedisConfig {
 
     // redis DB와 연결하는 역할
     @Bean
-    public RedisConnectionFactory connectionFactory(){
-        return new LettuceConnectionFactory(host,port);
+    public RedisConnectionFactory connectionFactory() {
+        return new LettuceConnectionFactory(host, port);
     }
 
 
     @Bean
-    public RedisTemplate<String, String> redisTemplate(){
-        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+    public RedisTemplate<String, Object> redisTemplate() {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(connectionFactory());
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
