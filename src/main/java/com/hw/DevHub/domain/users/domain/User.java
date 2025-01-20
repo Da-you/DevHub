@@ -1,8 +1,11 @@
 package com.hw.DevHub.domain.users.domain;
 
 import com.hw.DevHub.domain.model.BaseTimeEntity;
+import com.hw.DevHub.domain.model.Position;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,18 +26,29 @@ public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
+
     @Column(nullable = false)
     private String email;
+
     @Column(nullable = false)
     private String password;
+
     @Column(nullable = false)
     private String name;
+
     @Column(nullable = false)
     private String phoneNumber;
+
     @Column(nullable = false)
     private String nickname;
+
     private String profileMessage;
+
     private String profileImagePath;
+
+    @Enumerated(EnumType.STRING)
+    private Position position;
+
 
     @Builder
     public User(String email, String password, String name, String phoneNumber,
@@ -44,6 +58,10 @@ public class User extends BaseTimeEntity {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.nickname = nickname;
+    }
+
+    public void updatePosition(Position position) {
+        this.position = position;
     }
 
     public void updateProfileMessage(String profileMessage) {

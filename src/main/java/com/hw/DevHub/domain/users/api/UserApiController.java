@@ -1,5 +1,6 @@
 package com.hw.DevHub.domain.users.api;
 
+import com.hw.DevHub.domain.model.Position;
 import com.hw.DevHub.domain.users.dto.UserRequest.LoginRequest;
 import com.hw.DevHub.domain.users.dto.UserRequest.SignUpRequest;
 import com.hw.DevHub.domain.users.dto.UserResponse.MypageResponse;
@@ -10,7 +11,6 @@ import com.hw.DevHub.global.annotation.LoginRequired;
 import com.hw.DevHub.global.response.ApiResponse;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -74,6 +74,12 @@ public class UserApiController {
     public void updateProfileMessage(@CurrentUser Long userId,
         @RequestParam @NotNull String profileMessage) {
         userService.updateProfileMessage(userId, profileMessage);
+    }
+
+    @LoginRequired
+    @PatchMapping("/position")
+    public void updatePosition(@CurrentUser Long userId, @RequestBody Position position) {
+        userService.updatePosition(userId, position);
     }
 
     @LoginRequired

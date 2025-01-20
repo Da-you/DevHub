@@ -3,6 +3,7 @@ package com.hw.DevHub.domain.users.service;
 import com.hw.DevHub.domain.feed.dao.FeedRepository;
 import com.hw.DevHub.domain.feed.domain.Feed;
 import com.hw.DevHub.domain.feed.dto.FeedResponse.MypageFeeds;
+import com.hw.DevHub.domain.model.Position;
 import com.hw.DevHub.domain.users.component.encryption.CustomEncryptionComponent;
 import com.hw.DevHub.domain.users.dao.FollowRepository;
 import com.hw.DevHub.domain.users.dao.UserRepository;
@@ -88,6 +89,11 @@ public class UserService {
         User user = getUser(userId);
         String path = s3Component.uploadProfileImage(userId, file);
         user.updateProfileImagePath(path);
+    }
+    @Transactional
+    public void updatePosition(Long userId, Position position) {
+        User user = getUser(userId);
+        user.updatePosition(position);
     }
 
 
