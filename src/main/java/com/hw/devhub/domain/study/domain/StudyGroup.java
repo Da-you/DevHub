@@ -37,7 +37,7 @@ public class StudyGroup extends BaseTimeEntity {
 	private User leader;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT), nullable = false)
+	@JoinColumn(name = "cafe_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT), nullable = false)
 	private Cafe cafe;
 
 	@Column(nullable = false)

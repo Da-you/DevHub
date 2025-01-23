@@ -17,7 +17,6 @@ import com.hw.devhub.domain.users.dao.UserRepository;
 import com.hw.devhub.domain.users.domain.User;
 import com.hw.devhub.global.exception.ErrorCode;
 import com.hw.devhub.global.exception.GlobalException;
-
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -98,6 +97,5 @@ public class StudyService {
 			.capacity(group.getCapacity())
 			.currentCapacity(group.getCurrentCapacity())
 			.build();
-
 	}
 }
