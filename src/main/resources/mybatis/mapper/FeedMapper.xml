@@ -3,7 +3,7 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 
-<mapper namespace="com.hw.DevHub.domain.feed.mapper.FeedMapper">
+<mapper namespace="com.hw.devhub.domain.feed.mapper.FeedMapper">
   <insert id="insertFeed" parameterType="Feed">
     insert into feed (user_id, content)
     values (#{userId}, #{content})
@@ -51,7 +51,7 @@
     where user_id = ${userId}
     order by created_at desc limit 1
   </select>
-  <select id="getMypageFeeds" parameterType="Long" resultType="com.hw.DevHub.domain.feed.dto.FeedResponse$MypageFeeds">
+  <select id="getMypageFeeds" parameterType="Long" resultType="com.hw.devhub.domain.feed.dto.FeedResponse$MypageFeeds">
     select
         f.feed_id as feedId,
         i.image_path as thumbnailPath,

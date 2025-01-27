@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.hw.DevHub.domain.alarm.mapper.AlarmMapper">
+<mapper namespace="com.hw.devhub.domain.alarm.mapper.AlarmMapper">
   <insert id="insertAlarm" parameterType="Alarm">
     insert into alarm(from_user_id, target_user_id, is_read, alarm_type)
     values (#{fromUserId}, #{targetUserId}, #{isRead}, #{alarmType})
