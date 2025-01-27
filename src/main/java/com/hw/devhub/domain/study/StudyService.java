@@ -9,6 +9,7 @@ import com.hw.devhub.domain.cafe.dao.CafeRepository;
 import com.hw.devhub.domain.cafe.domain.Cafe;
 import com.hw.devhub.domain.study.dao.StudyMemberRepository;
 import com.hw.devhub.domain.study.dao.StudyGroupRepository;
+import com.hw.devhub.domain.study.dao.StudyQueryRepository;
 import com.hw.devhub.domain.study.domain.StudyGroup;
 import com.hw.devhub.domain.study.domain.StudyMember;
 import com.hw.devhub.domain.study.dto.StudyGroupResponse;
@@ -17,6 +18,7 @@ import com.hw.devhub.domain.users.dao.UserRepository;
 import com.hw.devhub.domain.users.domain.User;
 import com.hw.devhub.global.exception.ErrorCode;
 import com.hw.devhub.global.exception.GlobalException;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -26,6 +28,7 @@ public class StudyService {
 	private final StudyMemberRepository studyMemberRepository;
 	private final UserRepository userRepository;
 	private final CafeRepository cafeRepository;
+	private final StudyQueryRepository queryRepository;
 
 	@Transactional
 	public void createStudyGroup(Long userId, Long cafeId, StudyGrpupRequest request) {
@@ -59,7 +62,10 @@ public class StudyService {
 			() -> new GlobalException(ErrorCode.USER_NOT_FOUND)
 		);
 		StudyGroup study = studyRepository.findById(groupId)
-			.orElseThrow(() -> new GlobalException(ErrorCode.FEED_NOT_FOUND));
+			.orElseThrow(() -> new GlobalException(ErrorCode.GROUP_NOT_FOUND));
+		if (studyMemberRepository.getByMember(member)) {
+			throw new GlobalException(ErrorCode.ALREADY_JOIN_GORUP);
+		}
 		studyMemberRepository.save(
 			StudyMember.builder()
 				.member(member)
@@ -71,31 +77,24 @@ public class StudyService {
 
 	@Transactional(readOnly = true)
 	public List<StudyGroupResponse> getGroupList() {
-		List<StudyGroup> groups = studyRepository.findAll();
-		return groups.stream()
-			.map(group -> StudyGroupResponse.builder()
-				.groupName(group.getName())
-				.leader(group.getLeader().getNickname())
-				.createdAt(group.getCreatedAt())
-				.build()
-			)
-			.toList();
+		return queryRepository.findAllGroups();
 	}
 
 	@Transactional(readOnly = true)
 	public StudyGroupResponse getGroupDetail(Long groupId) {
-		StudyGroup group = studyRepository.findById(groupId).orElseThrow(
-			() -> new GlobalException(ErrorCode.FEED_NOT_FOUND)
-		);
-		return StudyGroupResponse.builder()
-			.groupName(group.getName())
-			.leader(group.getLeader().getNickname())
-			.createdAt(group.getCreatedAt())
-			.profileImagePath(group.getLeader().getProfileImagePath())
-			.startDateTime(group.getStartDateTime())
-			.endDateTime(group.getEndDateTime())
-			.capacity(group.getCapacity())
-			.currentCapacity(group.getCurrentCapacity())
-			.build();
+		// StudyGroup group = studyRepository.findById(groupId).orElseThrow(
+		// 	() -> new GlobalException(ErrorCode.FEED_NOT_FOUND)
+		// );
+		// return StudyGroupResponse.builder()
+		// 	.groupName(group.getName())
+		// 	.leader(group.getLeader().getNickname())
+		// 	.createdAt(group.getCreatedAt())
+		// 	.profileImagePath(group.getLeader().getProfileImagePath())
+		// 	.startDateTime(group.getStartDateTime())
+		// 	.endDateTime(group.getEndDateTime())
+		// 	.capacity(group.getCapacity())
+		// 	.currentCapacity(group.getCurrentCapacity())
+		// 	.build();
+		return queryRepository.getGroupDetailByGroupId(groupId);
 	}
 }

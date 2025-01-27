@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import com.hw.devhub.domain.cafe.domain.Cafe;
 import com.hw.devhub.domain.model.BaseTimeEntity;
 import com.hw.devhub.domain.users.domain.User;
+import com.hw.devhub.global.exception.ErrorCode;
+import com.hw.devhub.global.exception.GlobalException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -63,6 +65,9 @@ public class StudyGroup extends BaseTimeEntity {
 	}
 
 	public void addCapacity() {
+		if (this.capacity < this.currentCapacity) {
+			throw new GlobalException(ErrorCode.FULL_CAPACITY);
+		}
 		this.currentCapacity += 1;
 	}
 }
