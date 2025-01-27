@@ -4,9 +4,7 @@
 
 ## ERD
 
-[ERD 다이어그램 보기](https://www.erdcloud.com/p/7KLsvXWSHi6pRLmAs)
-![image](<img width="500" alt="image" src="https://github.com/user-attachments/assets/c4f65231-08b6-4540-b41a-adcd6199bba7" />
-)
+![ERD](https://github.com/user-attachments/assets/3c2695a2-4d77-4d55-8c58-223337fe0a41)
 ---
 
 ## Use Case
