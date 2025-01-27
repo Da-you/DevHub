@@ -3,8 +3,7 @@
 ----
 
 ## ERD
-
-![ERD]<img src="https://github.com/user-attachments/assets/3c2695a2-4d77-4d55-8c58-223337fe0a41" width="500" height="500" />
+<img src="https://github.com/user-attachments/assets/3c2695a2-4d77-4d55-8c58-223337fe0a41" width="750" height="500" />
 
 ---
 
