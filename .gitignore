@@ -179,5 +179,5 @@ gradle-wrapper.properties
 ### Gradle Patch ###
 # Java heap dump
 *.hprof
-
+.env
 # End of https://www.toptal.com/developers/gitignore/api/macos,windows,intellij+all,gradle
