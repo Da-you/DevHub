@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.hw.devhub.domain.alarm.model.AlarmType;
 import com.hw.devhub.infra.fcm.dto.FCMMessageRequest;
+
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.MediaType;
@@ -27,79 +29,77 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class FCMPushService {
 
-    private final ObjectMapper objectMapper;
+	private final ObjectMapper objectMapper;
 
-    private final RedisTemplate<String, Object> redisTemplate;
+	private final RedisTemplate<String, Object> redisTemplate;
 
-    @Value("${fcm.key.path}")
-    private String SERVICE_ACCOUNT;
-    @Value("${fcm.key.url}")
-    private String API_URL;
+	@Value("${fcm.key.path}")
+	private String SERVICE_ACCOUNT;
+	@Value("${fcm.key.url}")
+	private String API_URL;
 
+	public void setToken(Long userId) {
+		String key = String.valueOf(userId);
+		redisTemplate.opsForValue().set(key, getAccessToken());
+		redisTemplate.expire(key, Duration.ofHours(1));
+	}
 
-    public void setToken(Long userId) {
-        String key = String.valueOf(userId);
-        redisTemplate.opsForValue().set(key, getAccessToken());
-        redisTemplate.expire(key, Duration.ofHours(1));
-    }
+	public String getToken(Long userId) {
+		String key = String.valueOf(userId);
+		if (!redisTemplate.hasKey(key)) {
+			setToken(userId);
+		}
 
-    public String getToken(Long userId) {
-        String key = String.valueOf(userId);
-        if (!redisTemplate.hasKey(key)) {
-            setToken(userId);
-        }
+		return (String)redisTemplate.opsForValue().get(key);
+	}
 
-        return (String) redisTemplate.opsForValue().get(key);
-    }
+	public void deleteToken(Long userId) {
+		String key = String.valueOf(userId);
+		redisTemplate.delete(key);
+	}
 
-    public void deleteToken(Long userId) {
-        String key = String.valueOf(userId);
-        redisTemplate.delete(key);
-    }
+	private String makeMessage(String token) throws JsonProcessingException {
+		FCMMessageRequest fcmMessage = FCMMessageRequest.builder()
+			.message(FCMMessageRequest.Message.builder().token(token).notification(
+					FCMMessageRequest.Notification.builder().title(AlarmType.FOLLOWING.name())
+						.body("push.alarm.following")
+						.build())
+				.build()).validateOnly(false).build();
+		return objectMapper.writeValueAsString(fcmMessage);
+	}
 
+	public void sendFollowPushMessage(Long targetUserId) {
+		try {
+			String message = makeMessage(getToken(targetUserId));
 
-    private String makeMessage(String token) throws JsonProcessingException {
-        FCMMessageRequest fcmMessage = FCMMessageRequest.builder()
-            .message(FCMMessageRequest.Message.builder().token(token).notification(
-                    FCMMessageRequest.Notification.builder().title(AlarmType.FOLLOWING.name())
-                        .body("push.alarm.following")
-                        .build())
-                .build()).validateOnly(false).build();
-        return objectMapper.writeValueAsString(fcmMessage);
-    }
+			OkHttpClient client = new OkHttpClient();
 
-    public void sendFollowPushMessage(Long targetUserId) {
-        try {
-            String message = makeMessage(getToken(targetUserId));
+			RequestBody requestBody = RequestBody.create(message,
+				MediaType.get("application/json; charset=utf-8"));
 
-            OkHttpClient client = new OkHttpClient();
+			Request request = new Request.Builder().url(API_URL).post(requestBody)
+				.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken())
+				.addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
+				.build();
 
-            RequestBody requestBody = RequestBody.create(message,
-                MediaType.get("application/json; charset=utf-8"));
+			Response response = client.newCall(request).execute();
+		} catch (IOException e) {
+			log.error(e.getMessage(), targetUserId);
+		}
+	}
 
-            Request request = new Request.Builder().url(API_URL).post(requestBody)
-                .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken())
-                .addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
-                .build();
-
-            Response response = client.newCall(request).execute();
-        } catch (IOException e) {
-            log.error(e.getMessage(), targetUserId);
-        }
-    }
-
-    private String getAccessToken() {
-        try {
-            GoogleCredentials credential = GoogleCredentials.fromStream(
-                    new ClassPathResource(SERVICE_ACCOUNT).getInputStream())
-                .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
-            credential.refreshIfExpired();
-            log.info("getAccessToken() - googleCredentials: {} ",
-                credential.getAccessToken().getTokenValue());
-            return credential.getAccessToken().getTokenValue();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+	private String getAccessToken() {
+		try {
+			GoogleCredentials credential = GoogleCredentials.fromStream(
+					new ClassPathResource(SERVICE_ACCOUNT).getInputStream())
+				.createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
+			credential.refreshIfExpired();
+			log.info("getAccessToken() - googleCredentials: {} ",
+				credential.getAccessToken().getTokenValue());
+			return credential.getAccessToken().getTokenValue();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 }
