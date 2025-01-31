@@ -3,40 +3,42 @@ package com.hw.devhub.infra.fcm.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Builder
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
 public class FCMMessageRequest {
 
-    private boolean validateOnly;
-    private Message message;
+	private boolean validateOnly;
+	private Message message;
 
-    @Builder
-    @Getter
-    @AllArgsConstructor
-    public static class Message {
+	@Builder
+	@Getter
+	@AllArgsConstructor
+	public static class Message {
 
-        private Notification notification;
-        private String token;
-        private Data data;
-    }
+		private Notification notification;
+		private String token;
+		private Data data;
+	}
 
-    @Builder
-    @Getter
-    @AllArgsConstructor
-    public static class Notification {
+	@Builder
+	@Getter
+	@AllArgsConstructor
+	public static class Notification {
 
-        private String title;
-        private String body;
-    }
+		private String title;
+		private String body;
+	}
 
-    @Builder
-    @Getter
-    @AllArgsConstructor
-    public static class Data {
+	@Builder
+	@Getter
+	@AllArgsConstructor
+	public static class Data {
 
-        private String name;
-        private String description;
-    }
+		private String name;
+		private String description;
+	}
 }
